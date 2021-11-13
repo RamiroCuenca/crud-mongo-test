@@ -13,14 +13,20 @@ services:
     build: .
     # Ports it will expose (<container-port>:<image-port>)
     ports:
-      - "8080:8000"
+      - 8080:8000
     # Vinculate it with the other container
     links:
+      - database
+    depends_on:
       - database
   # Another container
   database:
     container_name: mongodatabase
     # From wich image is based
-    image: mongo
+    image: mongo:5.0.3
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
     ports:
-      - "27018:27017"
+      - 127.0.0.1:27018:27017
