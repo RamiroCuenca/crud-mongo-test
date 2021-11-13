@@ -1,0 +1,26 @@
+# Wich version of YML we are going to use
+version: "3"
+
+# Services are the images we are going to create
+services:
+  # We can put whatever name we want
+  app:
+    # Name of the container it will create
+    container_name: crudapp
+    # In case the container stop running
+    restart: always
+    # Where it must search the Dockerfile
+    build: .
+    # Ports it will expose (<container-port>:<image-port>)
+    ports:
+      - "8080:8000"
+    # Vinculate it with the other container
+    links:
+      - database
+  # Another container
+  database:
+    container_name: mongodatabase
+    # From wich image is based
+    image: mongo
+    ports:
+      - "27018:27017"
