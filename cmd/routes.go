@@ -12,6 +12,7 @@ func GetRouter() *mux.Router {
 	// Set up routes
 	mux.HandleFunc("/users/register", users.SignUp).Methods("POST")
 	mux.HandleFunc("/users/login", users.SignIn).Methods("POST")
+	mux.HandleFunc("/users/deletebyid", users.Delete).Methods("DELETE")
 
 	return mux
 }
