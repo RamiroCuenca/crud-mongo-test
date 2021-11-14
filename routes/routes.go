@@ -23,6 +23,7 @@ func GetRouter() *mux.Router {
 	mux.HandleFunc("/posts/create", posts.Create).Methods("POST")
 	mux.HandleFunc("/posts/getbyid", posts.GetById).Methods("GET")
 	mux.HandleFunc("/posts/getallfromuserid", posts.GetAllFromUserId).Methods("GET")
+	mux.HandleFunc("/posts/deletebyid", posts.Delete).Methods("DELETE")
 
 	return mux
 }
