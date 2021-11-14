@@ -1,4 +1,4 @@
-package main
+package routes
 
 import (
 	users "github.com/RamiroCuenca/crud-mongo-test/users/controllers"
