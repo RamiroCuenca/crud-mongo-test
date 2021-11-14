@@ -8,7 +8,7 @@ import (
 )
 
 // Verifys that the user sent a valid JWT token
-func AuthenticationMiddleware(f func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+func Authenticated(f func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
 		_, err := auth.ValidateToken(token) // auth is the package we created
