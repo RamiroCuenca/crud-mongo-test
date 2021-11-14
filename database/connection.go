@@ -12,10 +12,10 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// Set the connection to the database
+// Fetch database client
 func GetMongoClient() *mongo.Client {
 	// database is the service from docker-compose
-	uri := "mongodb://admin:password@localhost:27018" // uniform resource identifier
+	uri := "mongodb://admin:password@database:27017" // uniform resource identifier
 
 	// Connect to the database
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
