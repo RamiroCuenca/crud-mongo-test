@@ -13,7 +13,7 @@ services:
     networks:
       - application
 
-    app:
+  app:
     container_name: goapp
     restart: always
     build: .
