@@ -72,7 +72,7 @@ func GetById(w http.ResponseWriter, r *http.Request) {
 	err = postsCollection.FindOne(ctx, filter).Decode(&post)
 	if err != nil {
 		data := `{
-			"message": "We couldnt fetch any post with provided 'id'"
+			"message": "Couldnt fetch any post with provided 'id'"
 		}`
 		common.SendError(w, http.StatusBadRequest, []byte(data))
 		return
@@ -142,6 +142,46 @@ func GetAllFromUserId(w http.ResponseWriter, r *http.Request) {
 			"message": "There are 0 post vinculated with provided 'user_id'"
 		}`)
 	}
+
+	// Send response
+	common.SendResponse(w, http.StatusOK, []byte(data))
+}
+
+// Delete the post that matches with provided ObjectId
+func Delete(w http.ResponseWriter, r *http.Request) {
+	// Fetch post_id from request URL
+	oid, err := decodeIdFromURL(w, r)
+	if err != nil {
+		return
+	}
+
+	// Fetch posts collection
+	var postsCollection *mongo.Collection
+	postsCollection, ctx := fetchConnection()
+
+	// Delete the post that matches with the provided ObjectId
+	filter := bson.M{"_id": oid}
+	deleteResult, err := postsCollection.DeleteOne(ctx, filter)
+
+	if err != nil {
+		data := `{
+			"message": "There was an error deleting the post"
+		}`
+		common.SendError(w, http.StatusInternalServerError, []byte(data))
+		return
+	}
+
+	if deleteResult.DeletedCount == 0 {
+		data := `{
+			"message": "There weren't any post that match with the provided 'id'"
+		}`
+		common.SendError(w, http.StatusOK, []byte(data))
+		return
+	}
+
+	data := fmt.Sprintf(`{
+		"message": "Post deleted successfully"
+	}`)
 
 	// Send response
 	common.SendResponse(w, http.StatusOK, []byte(data))
