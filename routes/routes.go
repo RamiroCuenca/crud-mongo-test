@@ -1,6 +1,7 @@
 package routes
 
 import (
+	posts "github.com/RamiroCuenca/crud-mongo-test/posts/controllers"
 	users "github.com/RamiroCuenca/crud-mongo-test/users/controllers"
 	"github.com/gorilla/mux"
 )
@@ -17,6 +18,9 @@ func GetRouter() *mux.Router {
 
 	mux.HandleFunc("/users/deletebyid", users.Delete).Methods("DELETE")
 	mux.HandleFunc("/users/updatebyid", users.Update).Methods("PUT")
+
+	// Set up routes for posts
+	mux.HandleFunc("/posts/create", posts.Create).Methods("POST")
 
 	return mux
 }
