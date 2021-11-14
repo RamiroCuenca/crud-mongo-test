@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/RamiroCuenca/crud-mongo-test/auth"
 	"github.com/RamiroCuenca/crud-mongo-test/common"
 	"github.com/RamiroCuenca/crud-mongo-test/database"
 	"github.com/RamiroCuenca/crud-mongo-test/users/models"
@@ -45,10 +46,23 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	// Return the created user as a json
 	json, err := json.Marshal(user)
 
+	// Generate the JWT token
+	token, err := auth.GenerateToken(user)
+	if err != nil {
+		data := fmt.Sprintf(`{
+			"message": "User created successfully",
+			"user": %s,
+			"jwt": "There was an error generating the JWT token, try loggin in"
+		}`, json)
+		common.SendError(w, http.StatusOK, []byte(data))
+		return
+	}
+
 	data := fmt.Sprintf(`{
 		"message": "User created successfully",
-		"user": %s
-	}`, json)
+		"user": %s,
+		"jwt": %s
+	}`, json, token)
 
 	// Send response
 	common.SendResponse(w, http.StatusOK, []byte(data))
@@ -88,10 +102,23 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	// Return the fetched user as a json
 	json, err := json.Marshal(user)
 
+	// Generate the JWT token
+	token, err := auth.GenerateToken(user)
+	if err != nil {
+		data := fmt.Sprintf(`{
+			"message": "User logged in successfully",
+			"user": %s,
+			"jwt": "There was an error generating the JWT token, try loggin in again"
+		}`, json)
+		common.SendError(w, http.StatusOK, []byte(data))
+		return
+	}
+
 	data := fmt.Sprintf(`{
 		"message": "User logged in successfully",
-		"user": %s
-	}`, json)
+		"user": %s,
+		"jwt": %s
+	}`, json, token)
 
 	// Send response
 	common.SendResponse(w, http.StatusOK, []byte(data))
