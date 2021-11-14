@@ -10,7 +10,8 @@ func GetRouter() *mux.Router {
 	mux := mux.NewRouter()
 
 	// Set up routes
-	mux.HandleFunc("/users/create", users.Create).Methods("POST")
+	mux.HandleFunc("/users/register", users.SignUp).Methods("POST")
+	mux.HandleFunc("/users/login", users.SignIn).Methods("POST")
 
 	return mux
 }
