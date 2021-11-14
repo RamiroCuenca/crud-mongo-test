@@ -18,7 +18,7 @@ import (
 // Register a new user
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	// Create a object where we are going to store the user values
-	user, err := decodeDataFromBody(w, r)
+	user, err := decodeUserFromBody(w, r)
 	if err != nil {
 		return
 	}
@@ -57,7 +57,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 // Log in with an existing user
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	// Create a object where we are going to store the user values
-	user, err := decodeDataFromBody(w, r)
+	user, err := decodeUserFromBody(w, r)
 	if err != nil {
 		return
 	}
@@ -97,8 +97,44 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	common.SendResponse(w, http.StatusOK, []byte(data))
 }
 
+// Delete a user that matches with the provided ObjectId
+func Delete(w http.ResponseWriter, r *http.Request) {
+	// Fetch the id from request body
+	oid, err := decodeIdFromURL(w, r)
+	if err != nil {
+		return
+	}
+
+	// Fetch users collection
+	var usersCollection *mongo.Collection
+	usersCollection, ctx := fetchConnection()
+
+	// Delete the user that matches with the provided ObjectId
+	result, err := usersCollection.DeleteOne(ctx, bson.M{"_id": oid})
+	if err != nil {
+		data := `{
+			"message": "There was an error while trying to delete the user"
+		}`
+		common.SendError(w, http.StatusInternalServerError, []byte(data))
+		return
+	}
+
+	if result.DeletedCount == 0 {
+		data := `{
+			"message": "Couldnt fetch any object with the provided ObjectId"
+		}`
+		common.SendResponse(w, http.StatusOK, []byte(data))
+		return
+	}
+
+	data := `{
+		"message": "User deleted successfully"
+	}`
+	common.SendResponse(w, http.StatusOK, []byte(data))
+}
+
 // Decodes username and password from request body and returns a User object
-func decodeDataFromBody(w http.ResponseWriter, r *http.Request) (models.User, error) {
+func decodeUserFromBody(w http.ResponseWriter, r *http.Request) (models.User, error) {
 	var u models.User
 
 	// Decode the username and password from request body
@@ -113,6 +149,24 @@ func decodeDataFromBody(w http.ResponseWriter, r *http.Request) (models.User, er
 	}
 
 	return u, nil
+}
+
+// Decode id from request body and returns a primitive.ObjectID
+func decodeIdFromURL(w http.ResponseWriter, r *http.Request) (primitive.ObjectID, error) {
+	urlParam := r.URL.Query().Get("id")
+
+	// It's a string, should turn it into a primitive.ID
+	oid, err := primitive.ObjectIDFromHex(urlParam)
+	if err != nil {
+		data := fmt.Sprintf(`{
+			"message": "The provided 'id' is invalid. Try sending a valid one",
+			"error": %s
+		}`, err.Error())
+		common.SendError(w, http.StatusBadRequest, []byte(data))
+		return oid, err
+	}
+
+	return oid, nil
 }
 
 // Fetch users collection and the context
