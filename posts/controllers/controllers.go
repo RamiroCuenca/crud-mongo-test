@@ -90,6 +90,63 @@ func GetById(w http.ResponseWriter, r *http.Request) {
 	common.SendResponse(w, http.StatusOK, []byte(data))
 }
 
+// Fetch all posts from one user
+func GetAllFromUserId(w http.ResponseWriter, r *http.Request) {
+	// Fetch user_id from request URL
+	oid, err := decodeIdFromURL(w, r)
+	if err != nil {
+		return
+	}
+
+	// Create an array of objects where we are going to store the fetched data
+	var posts []models.Post
+
+	// Fetch posts collection
+	var postsCollection *mongo.Collection
+	postsCollection, ctx := fetchConnection()
+
+	// Fetch all posts that matches with the provided user ObjectId
+	filter := bson.M{"user_id": oid}
+	cursor, err := postsCollection.Find(ctx, filter)
+	if err != nil {
+		data := `{
+			"message": "We couldnt fetch any post with provided 'id'"
+		}`
+		common.SendError(w, http.StatusBadRequest, []byte(data))
+		return
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var p models.Post
+		if err = cursor.Decode(&p); err != nil {
+			data := `{
+				"message": "There was an error decoding fetched posts"
+			}`
+			common.SendError(w, http.StatusBadRequest, []byte(data))
+			return
+		}
+		posts = append(posts, p)
+	}
+
+	// Return the fetched post as a json
+	json, err := json.Marshal(posts)
+
+	data := fmt.Sprintf(`{
+		"message": "Posts fetched successfully",
+		"posts": %s
+	}`, json)
+
+	if len(posts) == 0 {
+		data = fmt.Sprintf(`{
+			"message": "There are 0 post vinculated with provided 'user_id'"
+		}`)
+	}
+
+	// Send response
+	common.SendResponse(w, http.StatusOK, []byte(data))
+}
+
 // Decodes UserId, Title and Description from request body and returns a Post object
 func decodePostFromBody(w http.ResponseWriter, r *http.Request) (models.Post, error) {
 	var post models.Post
@@ -133,6 +190,10 @@ func decodePostFromBody(w http.ResponseWriter, r *http.Request) (models.Post, er
 // Decode id from request body and returns a primitive.ObjectID
 func decodeIdFromURL(w http.ResponseWriter, r *http.Request) (primitive.ObjectID, error) {
 	urlParam := r.URL.Query().Get("id")
+
+	if urlParam == "" {
+		urlParam = r.URL.Query().Get("user_id")
+	}
 
 	// It's a string, should turn it into a primitive.ID
 	oid, err := primitive.ObjectIDFromHex(urlParam)
