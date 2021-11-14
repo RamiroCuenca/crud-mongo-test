@@ -1,32 +1,31 @@
-# Wich version of YML we are going to use
-version: "3"
+version: "3.8"
 
-# Services are the images we are going to create
 services:
-  # We can put whatever name we want
-  app:
-    # Name of the container it will create
-    container_name: crudapp
-    # In case the container stop running
-    restart: always
-    # Where it must search the Dockerfile
-    build: .
-    # Ports it will expose (<container-port>:<image-port>)
-    ports:
-      - 8080:8000
-    # Vinculate it with the other container
-    links:
-      - database
-    depends_on:
-      - database
-  # Another container
-  database:
-    container_name: mongodatabase
-    # From wich image is based
+  mongodb:
+    container_name: database
     image: mongo:5.0.3
     restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
     ports:
-      - 127.0.0.1:27018:27017
+      - 27018:27017
+    networks:
+      - application
+
+    app:
+    container_name: goapp
+    restart: always
+    build: .
+    ports:
+      - 8080:8000
+    networks:
+      - application
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    
+networks:
+  application:
+    driver: bridge
