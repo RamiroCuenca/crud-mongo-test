@@ -14,6 +14,6 @@ type User struct {
 
 // Claim is the information that will be sent through the JWT Payload
 type Claim struct {
-	Username string `json:"username"`
+	Username string `json:"username" bson:"password,omitempty"`
 	jwt.StandardClaims
 }
