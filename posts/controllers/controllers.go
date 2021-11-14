@@ -12,6 +12,7 @@ import (
 	"github.com/RamiroCuenca/crud-mongo-test/posts/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Create a new post. UserId must be sent
@@ -22,6 +23,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Fetch posts collection
 	var postsCollection *mongo.Collection
 	postsCollection, ctx := fetchConnection()
 
@@ -43,6 +45,44 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	data := fmt.Sprintf(`{
 		"message": "Post created successfully",
+		"post": %s
+	}`, json)
+
+	// Send response
+	common.SendResponse(w, http.StatusOK, []byte(data))
+}
+
+// Fetch one post by id
+func GetById(w http.ResponseWriter, r *http.Request) {
+	// Fetch post_id from request URL
+	oid, err := decodeIdFromURL(w, r)
+	if err != nil {
+		return
+	}
+
+	// Create a object where we are going to store the fetched data
+	var post models.Post
+
+	// Fetch posts collection
+	var postsCollection *mongo.Collection
+	postsCollection, ctx := fetchConnection()
+
+	// Fetch the post that matches with the provided ObjectId
+	filter := bson.M{"_id": oid}
+	err = postsCollection.FindOne(ctx, filter).Decode(&post)
+	if err != nil {
+		data := `{
+			"message": "We couldnt fetch any post with provided 'id'"
+		}`
+		common.SendError(w, http.StatusBadRequest, []byte(data))
+		return
+	}
+
+	// Return the fetched post as a json
+	json, err := json.Marshal(post)
+
+	data := fmt.Sprintf(`{
+		"message": "Post fetched successfully",
 		"post": %s
 	}`, json)
 
@@ -88,6 +128,24 @@ func decodePostFromBody(w http.ResponseWriter, r *http.Request) (models.Post, er
 	post.Description = data.Description
 
 	return post, nil
+}
+
+// Decode id from request body and returns a primitive.ObjectID
+func decodeIdFromURL(w http.ResponseWriter, r *http.Request) (primitive.ObjectID, error) {
+	urlParam := r.URL.Query().Get("id")
+
+	// It's a string, should turn it into a primitive.ID
+	oid, err := primitive.ObjectIDFromHex(urlParam)
+	if err != nil {
+		data := fmt.Sprintf(`{
+			"message": "The provided 'id' is invalid. Try sending a valid one",
+			"error": %s
+		}`, err.Error())
+		common.SendError(w, http.StatusBadRequest, []byte(data))
+		return oid, err
+	}
+
+	return oid, nil
 }
 
 // Fetch posts collection and the context
