@@ -99,7 +99,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 // Delete a user that matches with the provided ObjectId
 func Delete(w http.ResponseWriter, r *http.Request) {
-	// Fetch the id from request body
+	// Fetch the id from request URL
 	oid, err := decodeIdFromURL(w, r)
 	if err != nil {
 		return
@@ -110,7 +110,8 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	usersCollection, ctx := fetchConnection()
 
 	// Delete the user that matches with the provided ObjectId
-	result, err := usersCollection.DeleteOne(ctx, bson.M{"_id": oid})
+	filter := bson.M{"_id": oid}
+	result, err := usersCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		data := `{
 			"message": "There was an error while trying to delete the user"
@@ -130,6 +131,54 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	data := `{
 		"message": "User deleted successfully"
 	}`
+	common.SendResponse(w, http.StatusOK, []byte(data))
+}
+
+func Update(w http.ResponseWriter, r *http.Request) {
+	// Fetch the id from request URL
+	oid, err := decodeIdFromURL(w, r)
+	if err != nil {
+		return
+	}
+
+	// Fetch the password from request Body
+	user, err := decodeUserFromBody(w, r)
+	if err != nil {
+		return
+	}
+
+	// Fetch users collection
+	var usersCollection *mongo.Collection
+	usersCollection, ctx := fetchConnection()
+
+	// Update the password from the user that matches with the provided ObjectId
+	filter := bson.M{"_id": oid}
+	update := bson.M{
+		"$set": bson.M{
+			"password": user.Password,
+		},
+	}
+
+	updateResult, err := usersCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		data := `{
+			"message": "There was an error while trying to update the user"
+		}`
+		common.SendError(w, http.StatusInternalServerError, []byte(data))
+		return
+	}
+
+	if updateResult.ModifiedCount == 0 {
+		data := `{
+			"message": "Couldnt fetch any object with the provided ObjectId"
+		}`
+		common.SendResponse(w, http.StatusOK, []byte(data))
+		return
+	}
+
+	data := fmt.Sprintf(`{
+		"message": "User password updated successfully"
+	}`)
 	common.SendResponse(w, http.StatusOK, []byte(data))
 }
 
