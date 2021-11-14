@@ -30,14 +30,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	// Insert the user on the Collection
 	result, err := usersCollection.InsertOne(ctx, user)
 	if err != nil {
-		if err != nil {
-			data := fmt.Sprintf(`{
+		data := fmt.Sprintf(`{
 				"message": "Couldn't register the user",
 				"error": %s
 			}`, err.Error())
-			common.SendError(w, http.StatusInternalServerError, []byte(data))
-			return
-		}
+		common.SendError(w, http.StatusInternalServerError, []byte(data))
+		return
+
 	}
 
 	user.Id = result.InsertedID.(primitive.ObjectID)
