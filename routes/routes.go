@@ -21,6 +21,7 @@ func GetRouter() *mux.Router {
 
 	// Set up routes for posts
 	mux.HandleFunc("/posts/create", posts.Create).Methods("POST")
+	mux.HandleFunc("/posts/getbyid", posts.GetById).Methods("GET")
 
 	return mux
 }
