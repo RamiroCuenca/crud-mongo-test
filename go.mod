@@ -1,4 +1,4 @@
-module github.com/RamiroCuenca/vozy-test
+module github.com/RamiroCuenca/crud-mongo-test
 
 go 1.17
 

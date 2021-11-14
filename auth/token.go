@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/RamiroCuenca/vozy-test/users/models"
+	"github.com/RamiroCuenca/crud-mongo-test/users/models"
 	"github.com/golang-jwt/jwt/v4"
 )
 

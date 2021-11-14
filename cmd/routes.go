@@ -1,7 +1,7 @@
 package main
 
 import (
-	users "github.com/RamiroCuenca/vozy-test/users/controllers"
+	users "github.com/RamiroCuenca/crud-mongo-test/users/controllers"
 	"github.com/gorilla/mux"
 )
 

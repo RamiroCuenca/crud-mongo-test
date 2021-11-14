@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/RamiroCuenca/vozy-test/common"
-	"github.com/RamiroCuenca/vozy-test/database"
-	"github.com/RamiroCuenca/vozy-test/users/models"
+	"github.com/RamiroCuenca/crud-mongo-test/common"
+	"github.com/RamiroCuenca/crud-mongo-test/database"
+	"github.com/RamiroCuenca/crud-mongo-test/users/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/mgo.v2/bson"
