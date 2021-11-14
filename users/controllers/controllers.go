@@ -175,6 +175,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	common.SendResponse(w, http.StatusOK, []byte(data))
 }
 
+// Update password from user that matches the provided id
 func Update(w http.ResponseWriter, r *http.Request) {
 	// Fetch the id from request URL
 	oid, err := decodeIdFromURL(w, r)

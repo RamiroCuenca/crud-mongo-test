@@ -187,6 +187,61 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	common.SendResponse(w, http.StatusOK, []byte(data))
 }
 
+// Update title and description from post that matches de provided id
+func Update(w http.ResponseWriter, r *http.Request) {
+	// Fetch post_id from request URL
+	oid, err := decodeIdFromURL(w, r)
+	if err != nil {
+		return
+	}
+
+	// Create a object where we are going to store the fetched data
+	var post models.Post
+	post.Id = oid
+
+	// Fetch the title and description from request body
+	post, err = decodePostFromBody(w, r)
+	if err != nil {
+		return
+	}
+
+	// Fetch posts collection
+	var postsCollection *mongo.Collection
+	postsCollection, ctx := fetchConnection()
+
+	// Update the post that matches with the provided ObjectId
+	filter := bson.M{"_id": oid}
+	update := bson.M{
+		"$set": bson.M{
+			"title":       post.Title,
+			"description": post.Description,
+		},
+	}
+	updateResult, err := postsCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		data := `{
+			"message": "There was an error while trying to update the post"
+		}`
+		common.SendError(w, http.StatusInternalServerError, []byte(data))
+		return
+	}
+
+	if updateResult.ModifiedCount == 0 {
+		data := `{
+			"message": "Couldnt fetch any post with the provided ObjectId"
+		}`
+		common.SendResponse(w, http.StatusOK, []byte(data))
+		return
+	}
+
+	data := fmt.Sprintf(`{
+		"message": "Post updated successfully"
+	}`)
+
+	// Send response
+	common.SendResponse(w, http.StatusOK, []byte(data))
+}
+
 // Decodes UserId, Title and Description from request body and returns a Post object
 func decodePostFromBody(w http.ResponseWriter, r *http.Request) (models.Post, error) {
 	var post models.Post
@@ -210,15 +265,18 @@ func decodePostFromBody(w http.ResponseWriter, r *http.Request) (models.Post, er
 		return post, err
 	}
 
-	// Convert the UserID into a primitive.ObjectID
-	post.UserId, err = primitive.ObjectIDFromHex(data.UserId)
-	if err != nil {
-		data := fmt.Sprintf(`{
+	// On update operation we are not going to send user id
+	if data.UserId != "" {
+		// Convert the UserID into a primitive.ObjectID
+		post.UserId, err = primitive.ObjectIDFromHex(data.UserId)
+		if err != nil {
+			data := fmt.Sprintf(`{
 		"message": "Provided 'user_id' is invalid. Try sending a valid one.",
 		"error": %s
 	}`, err.Error())
-		common.SendError(w, http.StatusBadRequest, []byte(data))
-		return post, err
+			common.SendError(w, http.StatusBadRequest, []byte(data))
+			return post, err
+		}
 	}
 
 	post.Title = data.Title
