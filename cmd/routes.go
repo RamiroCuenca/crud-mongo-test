@@ -13,6 +13,7 @@ func GetRouter() *mux.Router {
 	mux.HandleFunc("/users/register", users.SignUp).Methods("POST")
 	mux.HandleFunc("/users/login", users.SignIn).Methods("POST")
 	mux.HandleFunc("/users/deletebyid", users.Delete).Methods("DELETE")
+	mux.HandleFunc("/users/updatebyid", users.Update).Methods("PUT")
 
 	return mux
 }
