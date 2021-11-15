@@ -8,31 +8,31 @@ Also the application has authentication (register and log in) and protection to 
 
 ## Run Locally
 
-Clone the project
+Clone the project.
 
 ```bash
   git clone https://github.com/RamiroCuenca/crud-mongo-test.git
 ```
 
-Go to the project directory
+Go to the project directory.
 
 ```bash
   cd crud-mongo-test
 ```
 
-Build images from application and database
+Build images from application and database.
 
 ```bash
   docker-compose build
 ```
 
-Run the generetaed images
+Run the generated images.
 
 ```bash
   docker-compose up
 ```
 
-Run the unit tests
+Run the unit tests.
 
 ```bash
   go test ./... -cover 
@@ -54,7 +54,7 @@ Run the unit tests
 | `username` | `string` | **Required** |
 | `password` | `string` | **Required** |
 
-Returns a JWT (located on the headers) wich is necessary to access to access protected endpoints
+Returns a JWT (located on the headers) wich is necessary to access to access protected endpoints.
 
 
 #### Log In with an existing user
@@ -68,7 +68,7 @@ Returns a JWT (located on the headers) wich is necessary to access to access pro
 | `username` | `string` | **Required** |
 | `password` | `string` | **Required** |
 
-Returns a JWT (located on the headers) wich is necessary to access to access protected endpoints
+Returns a JWT (located on the headers) wich is necessary to access to access protected endpoints.
 
   
 #### Update password from an existing user
