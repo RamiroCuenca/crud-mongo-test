@@ -49,7 +49,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}`, json)
 
 	// Send response
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), "")
 }
 
 // Fetch one post by id
@@ -87,7 +87,7 @@ func GetById(w http.ResponseWriter, r *http.Request) {
 	}`, json)
 
 	// Send response
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), "")
 }
 
 // Fetch all posts from one user
@@ -144,7 +144,7 @@ func GetAllFromUserId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send response
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), "")
 }
 
 // Delete the post that matches with provided ObjectId
@@ -184,7 +184,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	}`)
 
 	// Send response
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), "")
 }
 
 // Update title and description from post that matches de provided id
@@ -230,7 +230,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		data := `{
 			"message": "Couldnt fetch any post with the provided ObjectId"
 		}`
-		common.SendResponse(w, http.StatusOK, []byte(data))
+		common.SendResponse(w, http.StatusOK, []byte(data), "")
 		return
 	}
 
@@ -239,7 +239,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}`)
 
 	// Send response
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), "")
 }
 
 // Decodes UserId, Title and Description from request body and returns a Post object

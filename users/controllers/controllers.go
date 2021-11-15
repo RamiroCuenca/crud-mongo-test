@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/RamiroCuenca/crud-mongo-test/auth"
 	"github.com/RamiroCuenca/crud-mongo-test/common"
 	"github.com/RamiroCuenca/crud-mongo-test/database"
 	"github.com/RamiroCuenca/crud-mongo-test/users/models"
@@ -44,34 +45,30 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	// Return the created user as a json
 	json, err := json.Marshal(user)
 
+	// /*
+	// Response with JWT
+
 	// Generate the JWT token
-	// token, err := auth.GenerateToken(user)
-	// if err != nil {
-	// 	data := fmt.Sprintf(`{
-	// 		"message": "User created successfully",
-	// 		"user": %s,
-	// 		"jwt": "There was an error generating the JWT token, try loggin in"
-	// 	}`, json)
-	// 	common.SendError(w, http.StatusOK, []byte(data))
-	// 	return
-	// }
-
-	// data := fmt.Sprintf(`{
-	// 	"message": "User created successfully",
-	// 	"user": %s,
-	// 	"jwt": %s
-	// }`, json, token)
-
-	// Send response
-	// common.SendResponse(w, http.StatusOK, []byte(data))
+	token, err := auth.GenerateToken(user)
+	if err != nil {
+		data := fmt.Sprintf(`{
+			"message": "User created successfully",
+			"user": %s,
+			"jwt": "There was an error generating the JWT token, try loggin in"
+		}`, json)
+		common.SendError(w, http.StatusOK, []byte(data))
+		return
+	}
 
 	data := fmt.Sprintf(`{
 		"message": "User created successfully",
-		"user": %s
-	}`, json)
+		"user": %s,
+		"jwt": "%s"
+	}`, json, token)
 
 	// Send response
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), token)
+
 }
 
 // Log in with an existing user
@@ -108,34 +105,29 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	// Return the fetched user as a json
 	json, err := json.Marshal(user)
 
+	// /*
+	// Response with JWT
+
 	// Generate the JWT token
-	// token, err := auth.GenerateToken(user)
-	// if err != nil {
-	// 	data := fmt.Sprintf(`{
-	// 		"message": "User logged in successfully",
-	// 		"user": %s,
-	// 		"jwt": "There was an error generating the JWT token, try loggin in again"
-	// 	}`, json)
-	// 	common.SendError(w, http.StatusOK, []byte(data))
-	// 	return
-	// }
-
-	// data := fmt.Sprintf(`{
-	// 	"message": "User logged in successfully",
-	// 	"user": %s,
-	// 	"jwt": %s
-	// }`, json, token)
-
-	// // Send response
-	// common.SendResponse(w, http.StatusOK, []byte(data))
+	token, err := auth.GenerateToken(user)
+	if err != nil {
+		data := fmt.Sprintf(`{
+			"message": "User logged in successfully",
+			"user": %s,
+			"jwt": "There was an error generating the JWT token, try loggin in again"
+		}`, json)
+		common.SendError(w, http.StatusOK, []byte(data))
+		return
+	}
 
 	data := fmt.Sprintf(`{
 		"message": "User logged in successfully",
-		"user": %s
-	}`, json)
+		"user": %s,
+		"jwt": "%s"
+	}`, json, token)
 
 	// Send response
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), token)
 }
 
 // Delete a user that matches with the provided ObjectId
@@ -165,14 +157,14 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		data := `{
 			"message": "Couldnt fetch any object with the provided ObjectId"
 		}`
-		common.SendResponse(w, http.StatusOK, []byte(data))
+		common.SendResponse(w, http.StatusOK, []byte(data), "")
 		return
 	}
 
 	data := `{
 		"message": "User deleted successfully"
 	}`
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), "")
 }
 
 // Update password from user that matches the provided id
@@ -214,14 +206,14 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		data := `{
 			"message": "Couldnt fetch any object with the provided ObjectId"
 		}`
-		common.SendResponse(w, http.StatusOK, []byte(data))
+		common.SendResponse(w, http.StatusOK, []byte(data), "")
 		return
 	}
 
 	data := fmt.Sprintf(`{
 		"message": "User password updated successfully"
 	}`)
-	common.SendResponse(w, http.StatusOK, []byte(data))
+	common.SendResponse(w, http.StatusOK, []byte(data), "")
 }
 
 // Decodes username and password from request body and returns a User object

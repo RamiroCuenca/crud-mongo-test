@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 	"sync"
 
 	"github.com/RamiroCuenca/crud-mongo-test/auth"
@@ -13,14 +13,16 @@ import (
 var once sync.Once
 
 func main() {
-	dir, _ := os.Getwd()
-	// Parse the certificates/keys (JWT)
-	auth.LoadCertificates(
-		dir+"/certificates/app.rsa",
-		dir+"/certificates/app.rsa.pub",
-	)
+	// dir, _ := os.Getwd()
+	// // Parse the certificates/keys (JWT)
+	// auth.LoadCertificates(
+	// 	dir+"/certificates/app.rsa",
+	// 	dir+"/certificates/app.rsa.pub",
+	// )
+	if err := auth.LoadCertificates(); err != nil {
+		log.Fatalf("Could not load the certificates/keys. Error: %v", err)
+	}
 	// if err != nil {
-	// 	log.Fatalf("Could not load the certificates/keys. Error: %v", err)
 	// }
 
 	// Get router

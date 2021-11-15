@@ -3,8 +3,13 @@ package common
 import "net/http"
 
 // Send response to a successful http request
-func SendResponse(w http.ResponseWriter, status int, data []byte) {
+func SendResponse(w http.ResponseWriter, status int, data []byte, jwt string) {
 	w.Header().Set("Content-Type", "application/json")
+
+	if jwt != "" {
+		w.Header().Set("Authorization", jwt)
+	}
+
 	w.WriteHeader(status)
 	w.Write(data)
 }

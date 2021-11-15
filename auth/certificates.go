@@ -2,7 +2,9 @@ package auth
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"sync"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -18,24 +20,34 @@ var (
 // so that the other packages can not manipulate them
 
 // Singleton that assign a value to this vars only once (EXPORTED)
-func LoadCertificates(privateFile, publicFile string) error {
+func LoadCertificates() error {
 	var err error
 
 	once.Do(func() {
-		err = loadCertificates(privateFile, publicFile)
+		err = loadCertificates()
 	})
 
 	return err
 }
 
 // Loads the certicates and send them to be parsed
-func loadCertificates(privateFile, publicFile string) error {
-	privateBytes, err := ioutil.ReadFile(privateFile)
+func loadCertificates() error {
+	// dir, _ := os.Getwd()
+
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, f := range files {
+		fmt.Println(f.Name())
+	}
+
+	privateBytes, err := ioutil.ReadFile("./app.rsa")
 	if err != nil {
 		return err
 	}
 
-	publicBytes, err := ioutil.ReadFile(publicFile)
+	publicBytes, err := ioutil.ReadFile("./app.rsa.pub")
 	if err != nil {
 		return err
 	}
