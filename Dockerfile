@@ -19,6 +19,9 @@ WORKDIR /app
 # Copy the executable binary file into this run stage image
 COPY --from=builder /app/build .
 
+# Copy auth certificates
+COPY ./certificates /app
+
 EXPOSE 8000
 
 # Execute the app
